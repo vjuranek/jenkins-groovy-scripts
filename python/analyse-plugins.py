@@ -21,26 +21,40 @@ def plugins_from_config(config_path):
     return plugins
 
 
+def _parse_manifest(content, skip_optional):
+    plugins = set()
+    try:
+        start = content.index("Plugin-Dependencies:") + len("Plugin-Dependencies:")
+    except ValueError:
+        return plugins
+    try:
+        end = content.index("Plugin-Developers")
+    except ValueError:
+        end = len(content)
+    deps = content[start:end]
+    deps = deps.replace('\n ', '')  # new line + one space indentation
+    deps = deps.replace('\r', '')
+    ps = deps.strip().split(',')
+    for p in ps:
+        parts = p.split(':')
+        try:
+            optional = False
+            if len(parts) > 2 and parts[2].index("=optional") == 0:
+                optional = True
+        except ValueError:
+            pass
+        if optional and skip_optional:
+            continue
+        else:
+            plugins.add(parts[0])
+    return plugins
+
+
 def plugins_from_manifest(manifest_path, skip_optional=True):
     plugins = set()
     with open(manifest_path, 'r') as mf:
         content = mf.read()
-        # dependencies can span multiple lines
-        start = content.index("Plugin-Dependencies:") + len("Plugin-Dependencies:")
-        end = content.index("Plugin-Developers")
-        deps = content[start:end].replace('\n ', '') # new line + one space indentation
-        ps = deps.strip().split(',')
-        for p in ps:
-            parts = p.split(':')
-            try:
-                if len(parts) > 1 and parts[2].index("=optional") == 0:
-                    optional = True
-            except:
-                optional = False
-            if optional and skip_optional:
-                continue
-            else:
-                plugins.add(parts[0])
+        plugins = _parse_manifest(content, skip_optional)
     return plugins
 
 
