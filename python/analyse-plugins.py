@@ -26,8 +26,9 @@ def get_job_configs(jobs_dir):
     for job in os.listdir(jobs_dir):
         job_dir = os.path.join(jobs_dir, job)
         if os.path.isdir(job_dir):
-            if os.path.isfile(os.path.join(job_dir, "config.xml")):
-                configs.add(os.path.join(job_dir, "config.xml"))
+            cfg = os.path.join(job_dir, "config.xml")
+            if os.path.isfile(cfg):
+                configs.add(cfg)
     return configs
 
 
