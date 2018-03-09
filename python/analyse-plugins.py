@@ -21,14 +21,26 @@ def plugins_from_config(config_path):
     return plugins
 
 
-def plugins_from_manifest(manifest_path):
+def plugins_from_manifest(manifest_path, skip_optional=True):
     plugins = set()
     with open(manifest_path, 'r') as mf:
-        for line in mf.readlines():
-            if line.startswith("Plugin-Dependencies:"):
-                ps = line.strip("Plugin-Dependencies:").strip().split(',')
-                for p in ps:
-                    plugins.add(p.split(':')[0])
+        content = mf.read()
+        # dependencies can span multiple lines
+        start = content.index("Plugin-Dependencies:") + len("Plugin-Dependencies:")
+        end = content.index("Plugin-Developers")
+        deps = content[start:end].replace('\n ', '') # new line + one space indentation
+        ps = deps.strip().split(',')
+        for p in ps:
+            parts = p.split(':')
+            try:
+                if len(parts) > 1 and parts[2].index("=optional") == 0:
+                    optional = True
+            except:
+                optional = False
+            if optional and skip_optional:
+                continue
+            else:
+                plugins.add(parts[0])
     return plugins
 
 
