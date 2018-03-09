@@ -21,6 +21,27 @@ def plugins_from_config(config_path):
     return plugins
 
 
+def plugins_from_manifest(manifest_path):
+    plugins = set()
+    with open(manifest_path, 'r') as mf:
+        for line in mf.readlines():
+            if line.startswith("Plugin-Dependencies:"):
+                ps = line.strip("Plugin-Dependencies:").strip().split(',')
+                for p in ps:
+                    plugins.add(p.split(':')[0])
+    return plugins
+
+
+def plugin_deps(plugin_name):
+    plugins = set()
+    plugin_dir = os.path.join(PLUGINS_DIR, plugin_name)
+    if os.path.isdir(plugin_dir):
+        manifest = os.path.join(PLUGINS_DIR, plugin_name, "META-INF/MANIFEST.MF")
+        if os.path.isfile(manifest):
+            plugins = plugins.union(plugins_from_manifest(manifest))
+    return plugins
+
+
 def get_job_configs(jobs_dir):
     configs = set()
     for job in os.listdir(jobs_dir):
@@ -36,11 +57,22 @@ def job_plugins():
     plugins = set()
     for conf in get_job_configs(JOBS_DIR):
         plugins = plugins.union(plugins_from_config(conf))
-    return sorted(plugins)
+    return plugins
+
+
+def plugins_from_deps(plugs):
+    plugins = set()
+    for plugin in plugs:
+        plugins = plugins.union(plugin_deps(plugin))
+    return plugins
 
 
 def main():
-    plugins = job_plugins()
+    jp = job_plugins()
+    print(jp)
+    dp = plugins_from_deps(jp)
+    print(dp)
+    plugins = sorted(jp.union(dp))
     for plugin in plugins:
         print(plugin)
     print("size: " + str(len(plugins)))
