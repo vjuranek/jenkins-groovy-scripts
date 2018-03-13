@@ -64,7 +64,11 @@ def plugin_deps(plugin_name):
     if os.path.isdir(plugin_dir):
         manifest = os.path.join(PLUGINS_DIR, plugin_name, "META-INF/MANIFEST.MF")
         if os.path.isfile(manifest):
-            plugins = plugins.union(plugins_from_manifest(manifest))
+            dep_plugins = plugins_from_manifest(manifest)
+            plugins = plugins.union(dep_plugins)
+            # search also dependencies of dependent plugins
+            for plugin in dep_plugins:
+                plugins = plugins.union(plugin_deps(plugin))
     return plugins
 
 
@@ -86,7 +90,7 @@ def job_plugins():
     return plugins
 
 
-def plugins_from_deps(plugs):
+def plugin_dependencies(plugs):
     plugins = set()
     for plugin in plugs:
         plugins = plugins.union(plugin_deps(plugin))
@@ -96,7 +100,7 @@ def plugins_from_deps(plugs):
 def main():
     jp = job_plugins()
     print(jp)
-    dp = plugins_from_deps(jp)
+    dp = plugin_dependencies(jp)
     print(dp)
     plugins = sorted(jp.union(dp))
     for plugin in plugins:
