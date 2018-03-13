@@ -33,7 +33,7 @@ def _parse_manifest(content, skip_optional):
         end = len(content)
     deps = content[start:end]
     deps = deps.replace('\n ', '')  # new line + one space indentation
-    deps = deps.replace('\r', '')
+    deps = deps.replace('\r', '')  # some plugins contains windows line breaks
     ps = deps.strip().split(',')
     for p in ps:
         parts = p.split(':')
@@ -83,9 +83,25 @@ def get_job_configs(jobs_dir):
     return configs
 
 
+def get_global_configs(jenkins_home):
+    configs = set()
+    for file in os.listdir(jenkins_home):
+        cfg = os.path.join(jenkins_home, file)
+        if os.path.isfile(cfg) and file.endswith(".xml"):
+            configs.add(cfg)
+    return configs
+
+
 def job_plugins():
     plugins = set()
     for conf in get_job_configs(JOBS_DIR):
+        plugins = plugins.union(plugins_from_config(conf))
+    return plugins
+
+
+def global_config_plugins():
+    plugins = set()
+    for conf in get_global_configs(JENKINS_HOME):
         plugins = plugins.union(plugins_from_config(conf))
     return plugins
 
@@ -100,9 +116,11 @@ def plugin_dependencies(plugs):
 def main():
     jp = job_plugins()
     print(jp)
-    dp = plugin_dependencies(jp)
+    gp = global_config_plugins()
+    print(gp)
+    dp = plugin_dependencies(jp.union(gp))
     print(dp)
-    plugins = sorted(jp.union(dp))
+    plugins = sorted(jp.union(gp).union(dp))
     for plugin in plugins:
         print(plugin)
     print("size: " + str(len(plugins)))
