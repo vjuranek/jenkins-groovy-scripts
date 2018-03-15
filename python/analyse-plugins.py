@@ -113,6 +113,15 @@ def plugin_dependencies(plugs):
     return plugins
 
 
+def installed_plugins():
+    plugins = set()
+    for plugin in os.listdir(PLUGINS_DIR):
+        plugin_dir = os.path.join(PLUGINS_DIR, plugin)
+        if os.path.isdir(plugin_dir):
+            plugins.add(plugin)
+    return plugins
+
+
 def main():
     jp = job_plugins()
     print(jp)
@@ -120,10 +129,12 @@ def main():
     print(gp)
     dp = plugin_dependencies(jp.union(gp))
     print(dp)
-    plugins = sorted(jp.union(gp).union(dp))
-    for plugin in plugins:
+    used_plugins = jp.union(gp).union(dp)
+    all_plugins = installed_plugins()
+    unused_plugins = all_plugins.difference(used_plugins)
+    for plugin in sorted(unused_plugins):
         print(plugin)
-    print("size: " + str(len(plugins)))
+    print("size: " + str(len(unused_plugins)))
 
 if __name__ == "__main__":
     main()
