@@ -1,0 +1,26 @@
+= Jenkins scripts
+
+== Backup
+
+* link:bash/simple-git-backup.sh[`bash/simple-git-backup.sh`] - simple bash script for backing up Jenkins config files (`$JENKINS_HOME/*.xml`) and jobs configurations (`jobs/**/config.xml`) into git and pushing it into remote repo.
+
+
+== Disk usage
+
+* link:bash/job-disk-usage.sh[`bash/job-disk-usage.sh`] - simple script which prints out disk used by Jenkins jobs in human readble format and sorted based on disk usage of the jobs.
+
+
+== Plugins
+
+* link:bash/plugins-used-by-jobs.sh[`bash/plugins-used-by-jobs.sh`] - prints plugings used by Jenkins jobs. As a basis is taken configs of the jobs (`$JOB_NAME/congif.xml`).
+This is simple solution, but not very robust, as some plugins can be used only by Jenkins master (e.g. various cloud providers plugins) or plugins may seem as unused, but is used by another plugin which depends on it.
+
+* link:python/analyse-plugins.py[`python/analyse-plugins.py`] - attempt for a more robust solution.
+Besides parsing job confgis and also global Jenkins config files (all `$JENKINS_HOME/*.xml` files), it also tries to parse plugins metadata and search for plugins dependencies.
+Give all dependency tree, it tries to list plugins which are not used by any job, Jenkins master or is dependency of another plugin.
+
+
+== System Groovy scripts
+
+link:groovy/[Scripts] for Jenkins Groovy console (`$JENKINS_URL/script`) or eventually for system Groovy jobs for various routine Jenkins administration tasks.
+What script does is usually obvious from script name. If not, description is in given script.
