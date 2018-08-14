@@ -1,3 +1,7 @@
+/**
+ * Enforce specified build rotation policy for all jobs.
+ */
+
 import jenkins.model.Jenkins
 import hudson.tasks.LogRotator
 

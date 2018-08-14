@@ -1,3 +1,7 @@
+/**
+ * Deletes builds of the jobs older the specified number.
+ */
+
 JOB_NAME = "test"
 MIN_JOB = 100
 

@@ -1,3 +1,7 @@
+/**
+ * Prints all jobs which are not in any view.
+ */
+
 import jenkins.model.Jenkins;
 import hudson.model.*
 

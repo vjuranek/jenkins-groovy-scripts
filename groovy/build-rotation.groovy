@@ -1,3 +1,7 @@
+/**
+ * Performs build rotation of all jobs.
+ */
+
 import jenkins.model.Jenkins
 
 Jenkins.instance.items.each { project ->

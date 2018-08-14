@@ -1,3 +1,9 @@
+/**
+ * For given Jenkins slaves iterates over all jobs tied to this slave and add appropriate lock (from Lock and latches plugin) if no lock is configured.
+ * It's typically used when you want to enforce that job acquire specified lock before running on given slave.
+ * Typically this is used to synchronize usage of some external resource which is not under Jenkins control (e.g. database etc.).
+ */
+
 import jenkins.model.Jenkins
 import hudson.tasks.BuildWrappers
 import hudson.Util
